@@ -2,13 +2,142 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tetris-the war of love</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tetris - The War of Love</title>
+    <!-- Google Fonts for Retro Arcade Aesthetics -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>score:0</h2>
-   <canvas id="tetris" height="600" width="300"></canvas>
+    <div class="background-stars"></div>
+    <div class="background-glow"></div>
+
+    <div class="app-container">
+        <!-- LEFT PANEL: Controls & Settings -->
+        <aside class="panel left-panel">
+            <div class="glass-card game-info">
+                <h1 class="game-logo">NEON<br><span class="accent-text">TETRIS</span></h1>
+                <p class="tagline">The War of Love</p>
+            </div>
+
+            <div class="glass-card audio-controls">
+                <h3>AUDIO</h3>
+                <div class="control-row">
+                    <label for="music-toggle">Background Music</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="music-toggle">
+                        <span class="slider"></span>
+                    </div>
+                </div>
+                <div class="control-row">
+                    <label for="sfx-toggle">Sound Effects</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="sfx-toggle" checked>
+                        <span class="slider"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card controls-guide">
+                <h3>CONTROLS</h3>
+                <div class="key-list">
+                    <div class="key-item"><span class="key-badge">←</span> <span class="key-badge">→</span> <span>Move Left / Right</span></div>
+                    <div class="key-item"><span class="key-badge">↑</span> <span>Rotate Clockwise</span></div>
+                    <div class="key-item"><span class="key-badge">↓</span> <span>Soft Drop</span></div>
+                    <div class="key-item"><span class="key-badge-wide">Space</span> <span>Hard Drop</span></div>
+                    <div class="key-item"><span class="key-badge">C</span> or <span class="key-badge">Shift</span> <span>Hold Piece</span></div>
+                    <div class="key-item"><span class="key-badge">P</span> or <span class="key-badge">Esc</span> <span>Pause / Resume</span></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CENTER PANEL: The Playfield and Overlays -->
+        <main class="panel center-panel">
+            <div class="board-container">
+                <canvas id="tetris" width="300" height="600"></canvas>
+
+                <!-- Screen Overlays -->
+                <div id="start-screen" class="overlay active">
+                    <div class="overlay-content">
+                        <h2 class="neon-title">NEON ARCADE</h2>
+                        <p class="overlay-sub">Prepare for the drops of love</p>
+                        <button id="start-btn" class="btn btn-primary">START GAME</button>
+                    </div>
+                </div>
+
+                <div id="pause-screen" class="overlay">
+                    <div class="overlay-content">
+                        <h2 class="neon-title">GAME PAUSED</h2>
+                        <div class="button-group">
+                            <button id="resume-btn" class="btn btn-primary">RESUME</button>
+                            <button id="restart-btn" class="btn btn-secondary">RESTART</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="game-over-screen" class="overlay">
+                    <div class="overlay-content">
+                        <h2 class="neon-title text-danger">GAME OVER</h2>
+                        <p class="score-summary">You scored <span id="final-score" class="accent-text">0</span></p>
+                        <button id="retry-btn" class="btn btn-primary">PLAY AGAIN</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Virtual Mobile Controller (Only visible on mobile screens) -->
+            <div class="mobile-controller">
+                <div class="d-pad">
+                    <button class="ctrl-btn" id="ctrl-left">←</button>
+                    <button class="ctrl-btn" id="ctrl-right">→</button>
+                    <button class="ctrl-btn" id="ctrl-down">↓</button>
+                </div>
+                <div class="action-buttons">
+                    <button class="ctrl-btn" id="ctrl-rotate">↻</button>
+                    <button class="ctrl-btn" id="ctrl-hold">HOLD</button>
+                    <button class="ctrl-btn ctrl-btn-wide" id="ctrl-drop">DROP</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- RIGHT PANEL: Stats, Next, and Hold -->
+        <aside class="panel right-panel">
+            <div class="glass-card next-container">
+                <h3>NEXT PIECE</h3>
+                <div class="preview-box">
+                    <canvas id="next-canvas" width="120" height="120"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-card hold-container">
+                <h3>HOLD PIECE</h3>
+                <div class="preview-box">
+                    <canvas id="hold-canvas" width="120" height="120"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-card stats-container">
+                <div class="stat-box">
+                    <span class="stat-label">SCORE</span>
+                    <span id="score-val" class="stat-value">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">LEVEL</span>
+                    <span id="level-val" class="stat-value">1</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">LINES</span>
+                    <span id="lines-val" class="stat-value">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">HIGH SCORE</span>
+                    <span id="highscore-val" class="stat-value font-gold">0</span>
+                </div>
+                <button id="pause-btn" class="btn btn-secondary btn-small">PAUSE GAME</button>
+            </div>
+        </aside>
+    </div>
 
     <script src="script.js"></script>
 </body>
